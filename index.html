@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <title>PCPH Terminal - Python & JS</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <!-- Terminal Python -->
+    <div class="terminal" id="py-terminal">
+      <div class="header">
+        <img src="assets/python-logo.svg" alt="Python">
+        <h3>Python PCPH</h3>
+      </div>
+      <div class="output" id="py-output"></div>
+      <div class="input-line">
+        <span class="prompt">>>> </span>
+        <input type="text" id="py-command" 
+               placeholder="pcph.Propósito(...)" 
+               data-terminal="py">
+      </div>
+    </div>
+
+    <!-- Terminal JavaScript -->
+    <div class="terminal" id="js-terminal">
+      <div class="header">
+        <img src="assets/js-logo.svg" alt="JavaScript">
+        <h3>JavaScript PCPH</h3>
+      </div>
+      <div class="output" id="js-output"></div>
+      <div class="input-line">
+        <span class="prompt">> </span>
+        <input type="text" id="js-command" 
+               placeholder="new pcph.Propósito(...)" 
+               data-terminal="js">
+      </div>
+    </div>
+  </div>
+
+  <script src="scripts/pcph-core.js"></script>
+  <script src="scripts/py-terminal.js"></script>
+  <script src="scripts/js-terminal.js"></script>
+</body>
+</html>
