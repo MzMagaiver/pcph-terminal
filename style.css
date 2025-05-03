@@ -1,0 +1,63 @@
+.container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  padding: 20px;
+  height: 100vh;
+}
+
+.terminal {
+  background: #1e1e1e;
+  border-radius: 8px;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  height: 90vh;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 15px;
+  color: #f0f0f0;
+}
+
+.header img {
+  height: 30px;
+}
+
+.output {
+  flex-grow: 1;
+  overflow-y: auto;
+  margin-bottom: 10px;
+  font-family: 'Courier New', monospace;
+  color: #f0f0f0;
+  white-space: pre-wrap;
+}
+
+.input-line {
+  display: flex;
+  align-items: center;
+}
+
+.prompt {
+  color: #4caf50;
+  margin-right: 8px;
+}
+
+input {
+  flex-grow: 1;
+  background: transparent;
+  border: none;
+  color: white;
+  font-family: 'Courier New', monospace;
+  outline: none;
+  padding: 5px;
+}
+
+/* Cores específicas por linguagem */
+#py-terminal { border-top: 3px solid #3776ab; }
+#js-terminal { border-top: 3px solid #f7df1e; }
+.py-output { color: #3776ab; }
+.js-output { color: #f7df1e; }
