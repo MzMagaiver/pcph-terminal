@@ -9,6 +9,8 @@ class PythonTerminal {
   init() {
     this.commandEl.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') this.execute();
+      if (e.key === 'ArrowUp') this.prevCommand();
+      if (e.key === 'ArrowDown') this.nextCommand();
     });
     this.printBanner();
   }
@@ -16,7 +18,7 @@ class PythonTerminal {
   printBanner() {
     this.print(`
 Python 3.9.0 (PCPH Edition)
-Digite "ajuda" para comandos disponíveis
+Digite "ajuda" para comandos ou "exemplos" para ver casos de uso
 `);
   }
 
@@ -25,6 +27,7 @@ Digite "ajuda" para comandos disponíveis
     if (!cmd) return;
 
     this.history.push(cmd);
+    this.historyIndex = this.history.length;
     this.print(`>>> ${cmd}`, 'input');
 
     try {
@@ -32,29 +35,118 @@ Digite "ajuda" para comandos disponíveis
       this.print(result, 'output');
     } catch (e) {
       this.print(`Erro: ${e.message}`, 'error');
+      if (e.mensagemCompleta) {
+        this.print(e.mensagemCompleta, 'error');
+      }
     }
 
     this.commandEl.value = '';
   }
 
   interpret(cmd) {
-    // Simulação de código Python
+    if (cmd === 'ajuda') return this.showHelp();
+    if (cmd === 'exemplos') return this.showExamples();
+    if (cmd === 'limpar') {
+      this.outputEl.innerHTML = '';
+      return '';
+    }
+
+    // Converter sintaxe Python para JS
     if (cmd.includes('pcph.Propósito')) {
       return this.handleProposito(cmd);
     }
-    if (cmd === 'ajuda') {
-      return this.showHelp();
-    }
+
     return `Comando não reconhecido: ${cmd}`;
   }
 
   handleProposito(cmd) {
-    // Extrai parâmetros do comando Python simulado
-    const match = cmd.match(/pcph\.Propósito\((.+)\)/);
-    if (!match) throw new Error('Sintaxe inválida');
+    try {
+      // Conversão básica Python -> JS
+      const jsCode = cmd
+        .replace(/pcph\.Propósito\(/g, 'new pcph.Propósito({')
+        .replace(/\)\s*$/g, '})')
+        .replace(/'/g, '"')
+        .replace(/#.*$/gm, '')
+        .replace(/,\s*\)/g, ')');
 
-    // Simulação da execução
-    return `✔ Propósito criado com:\n${match[1]}`;
+      const prop = eval(jsCode);
+      const analise = prop.analisar();
+
+      let output = `✔ Propósito "${prop.metadata.descrição}" criado\n`;
+      output += `ID: ${prop.metadata.id}\n`;
+      output += `Restrições: ${prop.restrições.length}\n`;
+
+      if (analise.status === 'aviso') {
+        output += `⚠ Atenções:\n${analise.sugestoes.join('\n')}`;
+      }
+
+      return output;
+    } catch (e) {
+      throw new ErroPCPH(
+        "Erro na criação do propósito",
+        `Comando: ${cmd}`,
+        "Verifique se usou a sintaxe correta:\npcph.Propósito(descrição=\"...\", restrições=[...])"
+      );
+    }
+  }
+
+  showHelp() {
+    return `
+Comandos PCPH Python:
+----------------------
+1. Criar propósito:
+   pcph.Propósito(
+       descrição="Validar formulário",
+       restrições=["email", "idade"]
+   )
+
+2. Comandos úteis:
+   ajuda       - Mostra esta mensagem
+   exemplos    - Mostra exemplos prontos
+   limpar      - Limpa o terminal
+`;
+  }
+
+  showExamples() {
+    return `
+Exemplos Prontos:
+------------------
+1. Validação de email:
+   pcph.Propósito(
+       descrição="Validar email",
+       restrições=[{
+           "nome": "email_valido",
+           "verificação": lambda e: '@' in e
+       }]
+   )
+
+2. Login de usuário:
+   pcph.Propósito(
+       descrição="Autenticar usuário",
+       restrições=[
+           {"nome": "usuario", "verificação": lambda u: len(u) >= 3},
+           {"nome": "senha", "verificação": lambda s: len(s) >= 6}
+       ],
+       ação=lambda d: print(f"Bem-vindo {d['usuario']}!")
+   )
+`;
+  }
+
+  prevCommand() {
+    if (this.historyIndex > 0) {
+      this.historyIndex--;
+      this.commandEl.value = this.history[this.historyIndex];
+    }
+  }
+
+  nextCommand() {
+    if (this.historyIndex < this.history.length - 1) {
+      this.historyIndex++;
+      this.commandEl.value = this.history[this.historyIndex];
+    } else {
+      this.historyIndex = this.history.length;
+      this.commandEl.value = '';
+    }
   }
 
   print(text, type = 'output') {
@@ -66,4 +158,7 @@ Digite "ajuda" para comandos disponíveis
   }
 }
 
-new PythonTerminal();
+// Inicialização
+document.addEventListener('DOMContentLoaded', () => {
+  new PythonTerminal();
+});
